@@ -1,0 +1,46 @@
+Pseudo-Code	-	Back-up versies
+Mats Dumonceau 6ICW 	3/11/2025
+
+Setup()
+-	Initialiseer SD-Kaart
+-	Als SD-Kaart niet beschikbaar ->
+    -	Sd_available = false
+    -	Ga verder zonder sd logging
+-	Anders ->
+    -	Sd_available = true
+    -	LastUsed = readLastVersion()
+        -	Als versiebestand niet bestaat -> maak aan met waarde 0
+        -	Als inhoud ongeldig is -> return 0
+    -	CurrentVersion = lastUsed + 1
+    -	currentFilename = “/CanSatSend” + currentVersion + “.txt”
+    -	saveLastVersion(currentVersion)
+loop()
+-	Als bmp beschikbaar is
+    -	Lees temp, pres, alt van bmp
+    -	Maak payload-string (csv format, “;” gescheiden)
+    -	Print payload naar serial monitor
+    -	Verstuur payload naar MQTT broker
+    -	Als sd beschikbaar -> writeToSD(payload)
+
+
+readLastVersion() (= INTEGER)
+-	Als /CanSatVersion.txt niet bestaat ->
+    -	Maak bestand met waarde “0”
+    -	Return 0
+-	Anders
+    -	Lees de eerste lijn als string en zet om naar een geheel getal “v”
+    -	Als v >= 0 -> return “v”
+    -	Anders -> return 0
+
+saveLastVersion(newLast)
+-	Open /CanSatVersion(newLast) om te schrijven
+-	Schrijf newLast als enige lijn
+-	Sluit bestand
+
+writeToSd(data)
+-	Open currentFilename in “append”-modus
+-	Als het bestand succesvol opent ->
+    -	Schrijf data + newline
+    -	Sluit bestand
+-	Anders ->
+    -	Toon foutmelding serial monitor
